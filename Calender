@@ -1,0 +1,74 @@
+Public Class Form1
+    Dim monthNum As Integer = 1
+    Dim daysPerMonth As Integer
+    Dim Year As Integer = Now.Year
+    Private Sub Form1_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        txtMonthName.Text = "January"
+        whichmonth(1)
+    End Sub
+    Private Sub monthForward_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnMonthForward.Click
+        monthNum += 1
+        If monthNum = 13 Then
+            monthNum = 1
+            Year += 1
+        End If
+        whichmonth(monthNum)
+    End Sub
+    Private Sub btnMonthBackward_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnMonthBackward.Click
+        monthNum -= 1
+        If monthNum = 0 Then
+            monthNum = 12
+            Year -= 1
+        End If
+        whichmonth(monthNum)
+    End Sub
+    Sub whichmonth(ByVal monthNum As Integer)
+        Select Case monthNum
+            Case 1
+                txtMonthName.Text = "January"
+                daysPerMonth = 31
+            Case 2
+                txtMonthName.Text = "Febuary"
+                If year Mod 4 = 0 Then
+                    daysPerMonth = 29
+                Else
+                    daysPerMonth = 28
+                End If
+            Case 3
+                txtMonthName.Text = "March"
+                daysPerMonth = 31
+            Case 4
+                txtMonthName.Text = "April"
+                daysPerMonth = 30
+            Case 5
+                txtMonthName.Text = "May"
+                daysPerMonth = 31
+            Case 6
+                txtMonthName.Text = "June"
+                daysPerMonth = 30
+            Case 7
+                txtMonthName.Text = "July"
+                daysPerMonth = 31
+            Case 8
+                txtMonthName.Text = "August"
+                daysPerMonth = 31
+            Case 9
+                txtMonthName.Text = "September"
+                daysPerMonth = 30
+            Case 10
+                txtMonthName.Text = "October"
+                daysPerMonth = 31
+            Case 11
+                txtMonthName.Text = "November"
+                daysPerMonth = 30
+            Case 12
+                txtMonthName.Text = "December"
+                daysPerMonth = 31
+        End Select
+        lstDaysOfMonth.Items.Clear()
+        For i As Integer = 0 To daysPerMonth - 1
+            lstDaysOfMonth.Items.Add(i + 1)
+        Next
+        txtYear.Text = Year
+    End Sub
+End Class
