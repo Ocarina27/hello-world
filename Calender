@@ -74,4 +74,7 @@ Public Class Form1
         Next
         txtYear.Text = Year
     End Sub
+    Private Sub lstDaysOfMonth_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstDaysOfMonth.DoubleClick
+        lstEvents.Items.Add(lstDaysOfMonth.Text)
+    End Sub
 End Class
