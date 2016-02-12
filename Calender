@@ -3,7 +3,10 @@ Public Class Form1
     Dim daysPerMonth As Integer
     Dim Year As Integer = Now.Year
     Private Sub Form1_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        Dim Weekday(6) As Integer
         txtMonthName.Text = "January"
+        lstDaysOfMonth.Select()
+
         whichmonth(1)
     End Sub
     Private Sub monthForward_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnMonthForward.Click
