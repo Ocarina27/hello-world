@@ -2,11 +2,13 @@ Public Class Form1
     Dim monthNum As Integer = 1
     Dim daysPerMonth As Integer
     Dim Year As Integer = Now.Year
+    Dim enteredEvents As Boolean = False
+    Dim EventTime(24), eventname(24), eventdetails(24) As String
+    Dim numevents As Integer = 0
     Private Sub Form1_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim Weekday(6) As Integer
-        txtMonthName.Text = "January"
+        txtMonthName.Text = Now.Month
         lstDaysOfMonth.Select()
-
         whichmonth(1)
     End Sub
     Private Sub monthForward_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnMonthForward.Click
@@ -73,5 +75,27 @@ Public Class Form1
             lstDaysOfMonth.Items.Add(i + 1)
         Next
         txtYear.Text = Year
+    End Sub
+    Private Sub lstDaysOfMonth_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstDaysOfMonth.DoubleClick
+        If enteredEvents Then
+            For i As Integer = 0 To numEvents - 1
+                lstEvents.Items.Add(EventTime(i) & eventname(i))
+                lstEvents.Items.Add("Click here for details.")
+            Next
+        End If
+    End Sub
+
+    Private Sub lstEvents_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstEvents.DoubleClick
+        If lstEvents.Text = "Click here for details." Then
+            txtEventDetails.Enabled = True
+            txtEventDetails.Select()
+        End If
+    End Sub
+    Private Sub btnEntrerText_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnEntrerText.Click
+
+
+    End Sub
+    Private Sub btnSubmitText_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSubmitText.Click
+
     End Sub
 End Class
