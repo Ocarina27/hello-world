@@ -3,12 +3,16 @@ Public Class Form1
     Dim daysPerMonth As Integer, numEvents As Integer = 0
     Dim Year As Integer = Now.Year
     Dim enteredEvents As Boolean = False
+    Dim makeNewEvent, deleteEvent As Boolean
     ''''''''''''''''''''''''''''''''''''
     Public eventTime(0) As String
     Public eventName(0) As String
     Public eventDetails(0) As String
+    Public eventTag(0, 1) As Integer
 
     Private Sub Form1_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        makeNewEvent = False
+        deleteEvent = False
         txtEventDetails.Enabled = False
         'Dim Weekday(6) As Integer
         txtMonthName.Text = Now.Month
@@ -29,32 +33,65 @@ Public Class Form1
         Public eventTime As String
         Public eventName As String
         Public eventDetails As String
+        Public eventTag As Integer
+        'Public (for multiple events per day)
     End Structure
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    Dim eventInfo(0) As structEvent
     Sub storeStructureData()
-        Dim numStructures As Integer
-        Dim eventInfo(0) As structEvent
-        numStructures = eventInfo.Count
-        ReDim Preserve eventInfo(numStructures + 1)
-        ReDim Preserve eventTime(numStructures + 1)
-        ReDim Preserve eventName(numStructures + 1)
-        ReDim Preserve eventDetails(numStructures + 1)
-        eventInfo(numStructures + 1) = getNewSructure(numStructures)
+        Dim numStructures As Integer = eventInfo.Count
+        Dim unwantedIndex As Integer
+        If makeNewEvent Then
+            numStructures = eventInfo.Count
+            ReDim Preserve eventInfo(numStructures + 1)    'structure array
+            ReDim Preserve eventTime(numStructures + 1)    'non-structure variable arrays
+            ReDim Preserve eventName(numStructures + 1)    'non-structure variable arrays
+            ReDim Preserve eventDetails(numStructures + 1) 'non-structure variable arrays
+            ReDim Preserve eventTag(numStructures + 1, 1) 'non-structure variable arrays
+            eventInfo(numStructures + 1) = getNewSructure(numStructures)
+            makeNewEvent = False
+        End If
+        If deleteEvent Then
+            shiftArrayvalues(eventInfo, unwantedIndex)
+            ReDim eventInfo(numStructures - 1)
+            deleteEvent = False
+        End If
     End Sub
 
-    Function getNewSructure(ByVal numStructures) As structEvent
-        Dim newStructure As structEvent
+    Function getNewSructure(ByVal numStructures As Integer) As structEvent
+        Dim newStructure As New structEvent
         Return newStructure
     End Function
 
+    Sub shiftArrayvalues(ByRef eventInfo() As structEvent, ByVal unwantedIndex As Integer)
+        If eventInfo.Count - 1 = unwantedIndex Then
+            For i As Integer = unwantedIndex + 1 To eventInfo.Count - 1
+                eventInfo(i - 1) = eventInfo(i)
+            Next
+        End If
+    End Sub
+
     Private Sub lstDaysOfMonth_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstDaysOfMonth.DoubleClick
-        If lstDaysOfMonth.Items.Count > 0 Then
-            eventInfo(0).eventName = InputBox("Enter event name:", "Event Name")
-            eventInfo(0).eventTime = InputBox("When will this event take place?", "Event Time")
-            lstEvents.Items.Clear() '<-----------------*change later*-----------------------------only allows 1 event per day
-            lstEvents.Items.Add(eventInfo(0).eventTime)
-            lstEvents.Items.Add(eventInfo(0).eventName)
+        Dim tagMatchFound As Boolean = 
+        If lstEvents.Items.Count > 0 Then
+            For i As Integer = 0 To eventInfo.Count - 1
+                If lstDaysOfMonth.SelectedValue = eventTag(i, 1) Then
+                tagMatchFound =
+                End If
+            Next
+            If Not tagMatchFound Then
+                makeNewEvent = True
+                storeStructureData()
+            End If
+            eventName(0) = InputBox("Enter event name:", "Event Name") '<------*change later*------requires masking
+            eventTime(0) = InputBox("When will this event take place?", "Event Time")
+            eventDetails(0) = InputBox("Enter event details:", "Event Details")
+            eventTag(0, 0) = monthNum
+            eventTag(0, 1) = lstDaysOfMonth.SelectedValue
+            lstEvents.Items.Clear() '<-----------------*change later*-------------------only allows 1 event per day
+            lstEvents.Items.Add(eventTime(0))
+            lstEvents.Items.Add(eventName(0))
             lstEvents.Items.Add("Click here to view details.")
             lstEvents.Items.Add("")
         End If
@@ -83,7 +120,7 @@ Public Class Form1
             Case 1
                 txtMonthName.Text = "January"
                 daysPerMonth = 31
-            Case 2
+            Case 2 +
                 txtMonthName.Text = "Febuary"
                 If Year Mod 4 = 0 Then
                     daysPerMonth = 29
@@ -127,7 +164,6 @@ Public Class Form1
         Next
         txtYear.Text = Year
     End Sub
-
 
     Private Sub lstEvents_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstEvents.DoubleClick
         If lstEvents.Text = "Click here to view details." Then
