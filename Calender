@@ -72,31 +72,6 @@ Public Class Form1
         End If
     End Sub
 
-    Private Sub lstDaysOfMonth_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstDaysOfMonth.DoubleClick
-        Dim tagMatchFound As Boolean = 
-        If lstEvents.Items.Count > 0 Then
-            For i As Integer = 0 To eventInfo.Count - 1
-                If lstDaysOfMonth.SelectedValue = eventTag(i, 1) Then
-                tagMatchFound =
-                End If
-            Next
-            If Not tagMatchFound Then
-                makeNewEvent = True
-                storeStructureData()
-            End If
-            eventName(0) = InputBox("Enter event name:", "Event Name") '<------*change later*------requires masking
-            eventTime(0) = InputBox("When will this event take place?", "Event Time")
-            eventDetails(0) = InputBox("Enter event details:", "Event Details")
-            eventTag(0, 0) = monthNum
-            eventTag(0, 1) = lstDaysOfMonth.SelectedValue
-            lstEvents.Items.Clear() '<-----------------*change later*-------------------only allows 1 event per day
-            lstEvents.Items.Add(eventTime(0))
-            lstEvents.Items.Add(eventName(0))
-            lstEvents.Items.Add("Click here to view details.")
-            lstEvents.Items.Add("")
-        End If
-    End Sub
-
     Private Sub monthForward_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnMonthForward.Click
         monthNum += 1
         If monthNum = 13 Then
@@ -174,7 +149,6 @@ Public Class Form1
     Private Sub btnEnterText_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnEnterText.Click
 
     End Sub
-
     Private Sub btnSubmitText_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSubmitText.Click
         txtEventDetails.Enabled = False
         btnEnterText.Enabled = True
@@ -192,6 +166,33 @@ Public Class Form1
     End Sub
 
     Private Sub lstDaysOfMonth_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstDaysOfMonth.SelectedIndexChanged
+        For i As Integer = 0 To eventInfo.Count - 1
+            If 
+        Next
+    End Sub
 
+    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+        Dim tagMatchFound As Boolean = False
+        If lstEvents.Items.Count > 0 Then
+            For i As Integer = 0 To eventInfo.Count - 1
+                If lstDaysOfMonth.SelectedValue = eventTag(i, 1) Then
+                    tagMatchFound = True
+                End If
+            Next
+            If Not tagMatchFound Then
+                makeNewEvent = True
+                storeStructureData()
+                eventName(0) = InputBox("Enter event name:", "Event Name") '<------*change later*------requires masking
+                eventTime(0) = InputBox("When will this event take place?", "Event Time")
+                eventDetails(0) = InputBox("Enter event details:", "Event Details")
+                eventTag(0, 0) = monthNum
+                eventTag(0, 1) = lstDaysOfMonth.SelectedValue
+                lstEvents.Items.Clear() '<-----------------*change later*-------------------only allows 1 event per day
+                lstEvents.Items.Add(eventTime(0))
+                lstEvents.Items.Add(eventName(0))
+                lstEvents.Items.Add("Click here to view details.")
+                lstEvents.Items.Add("")
+            End If
+        End If
     End Sub
 End Class
