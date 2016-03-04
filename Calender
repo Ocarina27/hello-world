@@ -1,25 +1,30 @@
-Public Class Form1
+Public Class frmCalander
+    Dim daysPassed As Integer = 0
+    Dim currentMonthDay, previousMonthDay As Integer
+    Dim secondTime As Boolean = False
     Dim monthNum As Integer = 1
-    Dim daysPerMonth As Integer, numEvents As Integer = 0
+    Dim firstWeekdayOfMonth() As String = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
+    Dim weekDayOfMonth() As String = {"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"}
+    Dim daysPerMonth, monthDayTag() As Integer, numEvents As Integer = 0
     Dim Year As Integer = Now.Year
     Dim enteredEvents As Boolean = False
     Dim makeNewEvent, deleteEvent As Boolean
+    Dim indexVar As Integer = -1
     ''''''''''''''''''''''''''''''''''''
     Public eventTime(0) As String
     Public eventName(0) As String
     Public eventDetails(0) As String
-    Public eventTag(0, 1) As Integer
+    Public eventTagDay(0), eventTagMonth(0), eventTagYear(0) As Integer
+    Public eventArrayNum As Integer = 1
 
     Private Sub Form1_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         makeNewEvent = False
         deleteEvent = False
-        txtEventDetails.Enabled = False
-        'Dim Weekday(6) As Integer
         txtMonthName.Text = Now.Month
         lstDaysOfMonth.Select()
-        whichmonth(1)
+        whichMonthAndWeekday()
         txtEventDetails.Enabled = False
-        btnEnterText.Enabled = True
+        btnEditText.Enabled = True
         btnMonthBackward.Enabled = True
         btnMonthForward.Enabled = True
         lstDaysOfMonth.Enabled = True
@@ -28,72 +33,50 @@ Public Class Form1
         txtWeekday.Enabled = True
         txtYear.Enabled = True
     End Sub
-
-    Public Structure structEvent
-        Public eventTime As String
-        Public eventName As String
-        Public eventDetails As String
-        Public eventTag As Integer
-        'Public (for multiple events per day)
-    End Structure
-    '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-    Dim eventInfo(0) As structEvent
     Sub storeStructureData()
-        Dim numStructures As Integer = eventInfo.Count
         Dim unwantedIndex As Integer
-        If makeNewEvent Then
-            numStructures = eventInfo.Count
-            ReDim Preserve eventInfo(numStructures + 1)    'structure array
-            ReDim Preserve eventTime(numStructures + 1)    'non-structure variable arrays
-            ReDim Preserve eventName(numStructures + 1)    'non-structure variable arrays
-            ReDim Preserve eventDetails(numStructures + 1) 'non-structure variable arrays
-            ReDim Preserve eventTag(numStructures + 1, 1) 'non-structure variable arrays
-            eventInfo(numStructures + 1) = getNewSructure(numStructures)
+        If makeNewEvent And secondTime Then
+            ReDim Preserve eventTime(eventArrayNum + 1)
+            ReDim Preserve eventName(eventArrayNum + 1)
+            ReDim Preserve eventDetails(eventArrayNum + 1)
+            ReDim Preserve eventTagDay(eventArrayNum + 1)
+            ReDim Preserve eventTagMonth(eventArrayNum + 1)
+            ReDim Preserve eventTagYear(eventArrayNum + 1)
+            eventArrayNum += 1
             makeNewEvent = False
+            secondTime = True
         End If
         If deleteEvent Then
-            shiftArrayvalues(eventInfo, unwantedIndex)
-            ReDim eventInfo(numStructures - 1)
+            shiftStringArrayValues(eventTime, unwantedIndex)
+            shiftStringArrayValues(eventName, unwantedIndex)
+            shiftStringArrayValues(eventDetails, unwantedIndex)
+            shiftIntegerArrayValues(eventTagDay, unwantedIndex)
+            shiftIntegerArrayValues(eventTagMonth, unwantedIndex)
+            shiftIntegerArrayValues(eventTagYear, unwantedIndex)
+            ReDim eventTime(eventArrayNum - 1)
+            ReDim eventName(eventArrayNum - 1)
+            ReDim eventDetails(eventArrayNum - 1)
+            ReDim eventTagDay(eventArrayNum - 1)
+            ReDim eventTagMonth(eventArrayNum - 1)
+            ReDim eventTagYear(eventArrayNum - 1)
+            eventArrayNum -= 1
             deleteEvent = False
         End If
     End Sub
 
-    Function getNewSructure(ByVal numStructures As Integer) As structEvent
-        Dim newStructure As New structEvent
-        Return newStructure
-    End Function
-
-    Sub shiftArrayvalues(ByRef eventInfo() As structEvent, ByVal unwantedIndex As Integer)
-        If eventInfo.Count - 1 = unwantedIndex Then
-            For i As Integer = unwantedIndex + 1 To eventInfo.Count - 1
-                eventInfo(i - 1) = eventInfo(i)
+    Sub shiftStringArrayValues(ByRef array() As String, ByVal unwantedIndex As Integer)
+        If array.Count - 1 = unwantedIndex Then
+            For i As Integer = unwantedIndex + 1 To array.Count - 1
+                array(i - 1) = array(i)
             Next
         End If
     End Sub
 
-    Private Sub lstDaysOfMonth_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstDaysOfMonth.DoubleClick
-        Dim tagMatchFound As Boolean = 
-        If lstEvents.Items.Count > 0 Then
-            For i As Integer = 0 To eventInfo.Count - 1
-                If lstDaysOfMonth.SelectedValue = eventTag(i, 1) Then
-                tagMatchFound =
-                End If
+    Sub shiftIntegerArrayValues(ByRef array() As Integer, ByVal unwantedIndex As Integer)
+        If array.Count - 1 = unwantedIndex Then
+            For i As Integer = unwantedIndex + 1 To array.Count - 1
+                array(i - 1) = array(i)
             Next
-            If Not tagMatchFound Then
-                makeNewEvent = True
-                storeStructureData()
-            End If
-            eventName(0) = InputBox("Enter event name:", "Event Name") '<------*change later*------requires masking
-            eventTime(0) = InputBox("When will this event take place?", "Event Time")
-            eventDetails(0) = InputBox("Enter event details:", "Event Details")
-            eventTag(0, 0) = monthNum
-            eventTag(0, 1) = lstDaysOfMonth.SelectedValue
-            lstEvents.Items.Clear() '<-----------------*change later*-------------------only allows 1 event per day
-            lstEvents.Items.Add(eventTime(0))
-            lstEvents.Items.Add(eventName(0))
-            lstEvents.Items.Add("Click here to view details.")
-            lstEvents.Items.Add("")
         End If
     End Sub
 
@@ -103,7 +86,7 @@ Public Class Form1
             monthNum = 1
             Year += 1
         End If
-        whichmonth(monthNum)
+        whichMonthAndWeekday()
     End Sub
 
     Private Sub btnMonthBackward_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnMonthBackward.Click
@@ -112,15 +95,16 @@ Public Class Form1
             monthNum = 12
             Year -= 1
         End If
-        whichmonth(monthNum)
+        whichMonthAndWeekday()
     End Sub
 
-    Sub whichmonth(ByVal monthNum As Integer)
+    Sub whichMonthAndWeekday()
+        Dim weekdayIndex As Integer
         Select Case monthNum
             Case 1
                 txtMonthName.Text = "January"
                 daysPerMonth = 31
-            Case 2 +
+            Case 2
                 txtMonthName.Text = "Febuary"
                 If Year Mod 4 = 0 Then
                     daysPerMonth = 29
@@ -158,26 +142,38 @@ Public Class Form1
                 txtMonthName.Text = "December"
                 daysPerMonth = 31
         End Select
+        ReDim weekDayOfMonth(daysPerMonth - 1)
+        ReDim monthDayTag(daysPerMonth - 1)
+        For i As Integer = 0 To weekDayOfMonth.Length - 1
+            If Now.DayOfWeek = weekDayOfMonth(i) Then
+                txtWeekday.Text = weekDayOfMonth(i)
+            End If
+        Next
+        previousMonthDay = 1
         lstDaysOfMonth.Items.Clear()
         For i As Integer = 0 To daysPerMonth - 1
             lstDaysOfMonth.Items.Add(i + 1)
+            monthDayTag(daysPerMonth - 1) = i
         Next
         txtYear.Text = Year
     End Sub
 
-    Private Sub lstEvents_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstEvents.DoubleClick
-        If lstEvents.Text = "Click here to view details." Then
-            txtEventDetails.Text = eventInfo(0).eventDetails
-        End If
-    End Sub
-
-    Private Sub btnEnterText_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnEnterText.Click
-
+    Private Sub btnEditText_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnEditText.Click
+        txtEventDetails.Enabled = True
+        txtEventDetails.Focus()
+        btnEditText.Enabled = False
+        btnMonthBackward.Enabled = False
+        btnMonthForward.Enabled = False
+        lstDaysOfMonth.Enabled = False
+        lstEvents.Enabled = False
+        txtMonthName.Enabled = False
+        txtWeekday.Enabled = False
+        txtYear.Enabled = False
     End Sub
 
     Private Sub btnSubmitText_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnSubmitText.Click
         txtEventDetails.Enabled = False
-        btnEnterText.Enabled = True
+        btnEditText.Enabled = True
         btnMonthBackward.Enabled = True
         btnMonthForward.Enabled = True
         lstDaysOfMonth.Enabled = True
@@ -187,11 +183,95 @@ Public Class Form1
         txtYear.Enabled = True
     End Sub
 
-    Private Sub lstDaysOfMonth_MouseHover(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstDaysOfMonth.MouseHover
-
+    Private Sub txtEventDetails_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles txtEventDetails.LostFocus
+        txtEventDetails.Enabled = False
     End Sub
 
-    Private Sub lstDaysOfMonth_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstDaysOfMonth.SelectedIndexChanged
 
+    Private Sub lstDaysOfMonth_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstDaysOfMonth.SelectedIndexChanged
+        For i As Integer = 0 To eventArrayNum - 1
+            If eventTagMonth(i) = monthNum And eventTagDay(i) = lstDaysOfMonth.SelectedValue And eventTagYear(i) = txtYear.Text Then
+                lstEvents.Items.Clear()
+                lstEvents.Items.Add(eventName(i))
+                lstEvents.Items.Add(eventTime(i))
+                lstEvents.Items.Add("Click here to view details.")
+            End If
+        Next
+        currentMonthDay = CInt(lstDaysOfMonth.SelectedItem)
+        txtWeekday.Text = weekDayOfMonth(getWeekdayIndex)
+        previousMonthDay = currentMonthDay
+    End Sub
+    Function getLastMonthWeekdayIndex(ByVal totaldays As Integer) As Integer
+        Dim weekdayIndex As Integer
+        daysPassed += (currentMonthDay - previousMonthDay)
+        If daysPassed > 0 Then
+            weekdayIndex = (daysPassed Mod 7)
+        ElseIf daysPassed < 0 Then
+            weekdayIndex = 7 - (daysPassed Mod 7)
+        End If
+        Return weekdayIndex
+    End Function
+
+    Function getWeekdayIndex() As Integer
+        Dim weekdayIndex As Integer
+        daysPassed = 0
+        daysPassed += (currentMonthDay - previousMonthDay)
+        If daysPassed > 0 Then
+            weekdayIndex = (daysPassed Mod 7)
+        ElseIf daysPassed < 0 Then
+            weekdayIndex = 7 - (daysPassed Mod 7)
+        End If
+        Return weekdayIndex
+    End Function
+
+    Private Sub btnNewEvent_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btnNewEvent.Click
+        Dim tagMatchFound As Boolean = False
+        If lstDaysOfMonth.SelectedIndex >= 0 Then
+            For i As Integer = 0 To eventArrayNum - 1
+                If lstDaysOfMonth.SelectedValue = eventTagDay(i) Then
+                    tagMatchFound = True
+                End If
+            Next
+        Else
+            MsgBox("Please select a day.")
+        End If
+        If tagMatchFound Then
+            makeNewEvent = True
+            storeStructureData()
+            eventName(eventArrayNum - 1) = InputBox("Enter event name:", "Event Name") '<------*change later*------requires masking
+            eventTime(eventArrayNum - 1) = InputBox("What time will this event take place?", "Event Time")
+            eventDetails(eventArrayNum - 1) = InputBox("Enter event details:", "Event Details")
+            For i As Integer = 0 To lstEvents.Items.Count - 2
+                For j As Integer = 0 To eventArrayNum - 1
+                    If lstEvents.SelectedValue(i) = eventName(j) And lstEvents.SelectedValue(i + 1) = eventTime(j) Then
+                        indexVar = j
+                    End If
+                Next
+            Next
+            If indexVar = -1 Then
+                lstEvents.Items.Clear()
+            ElseIf eventTagMonth(indexVar) = monthNum And eventTagDay(indexVar) = lstDaysOfMonth.SelectedValue And eventTagYear(indexVar) = txtYear.Text Then
+
+            End If
+            lstEvents.Items.Add(eventName(eventArrayNum - 1))
+            lstEvents.Items.Add(eventTime(eventArrayNum - 1))
+            lstEvents.Items.Add("Double-click here to view details.")
+            lstEvents.Items.Add("")
+            indexVar = -1
+        End If
+    End Sub
+
+    Private Sub lstEvents_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstEvents.DoubleClick
+        Dim indexVar1 As Integer
+        If lstEvents.SelectedItem.ToString = "Double-click here to view details." Then
+            For i As Integer = 0 To eventArrayNum - 1
+                If lstEvents.SelectedValue = eventTime(i) Then
+                    indexVar1 = i
+                End If
+            Next
+            txtEventDetails.ReadOnly = True
+            txtEventDetails.Text = eventDetails(indexVar1)
+            txtEventDetails.ReadOnly = False
+        End If
     End Sub
 End Class
